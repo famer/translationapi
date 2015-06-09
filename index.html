@@ -28,7 +28,9 @@
             var languageTo = supported_pairs[val][i];
             $('#languageTo').append($('<option></option>').html(languageTo).val(languageTo))
           }
-        }).change()
+        })
+        $('#languageFrom').val('en').change()
+        $('#languageTo').val('es')
 
 
     });
