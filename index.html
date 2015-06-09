@@ -19,16 +19,16 @@
     $(function() {
         $('#previousQuery').html(localStorage.getItem('previousQuery'))
         for (i in supported_pairs) {
-      		$('#languageFrom').append($('<option></option>').html(i).val(i) )
+          $('#languageFrom').append($('<option></option>').html(i).val(i) )
         }
-	      $('#languageFrom').change(function() {
-	        var val = $(this).val()
-	        $('#languageTo').html('')
-	        for (i in supported_pairs[val]) {
-						var languageTo = supported_pairs[val][i];
-	          $('#languageTo').append($('<option></option>').html(languageTo).val(languageTo))
-	        }
-	      }).change()
+        $('#languageFrom').change(function() {
+          var val = $(this).val()
+          $('#languageTo').html('')
+          for (i in supported_pairs[val]) {
+            var languageTo = supported_pairs[val][i];
+            $('#languageTo').append($('<option></option>').html(languageTo).val(languageTo))
+          }
+        }).change()
 
 
     });
@@ -37,17 +37,22 @@
 
         var languageFrom = $('#languageFrom').val()
         var languageTo = $('#languageTo').val()
+        $('#result').html('loading...')
         $.getJSON( baseUrl, { q: $('#q').val(), langpair: languageFrom+"|"+languageTo})
-	        .done(function(json) {
-	          $('#result').html(json.responseData.translatedText)
-	      		var previousQuery = $('#q').val() + " from: " + languageFrom + " to: " + languageTo
-	      		localStorage.setItem('previousQuery', previousQuery)
-	          $('#previousQuery').html(localStorage.getItem('previousQuery'))
-	        })
-	        .fail(function( jqxhr, textStatus, error ) {
-	          var err = textStatus + ", " + error
-	          $('#result').html(err)
-	      	})
+          .done(function(json) {
+            if (json.responseData.translatedText) {
+              $('#result').html(json.responseData.translatedText)
+              var previousQuery = $('#q').val() + " from: " + languageFrom + " to: " + languageTo
+              localStorage.setItem('previousQuery', previousQuery)
+              $('#previousQuery').html(localStorage.getItem('previousQuery'))
+            } else {
+              $('#result').html(json.responseDetails)
+            }
+          })
+          .fail(function( jqxhr, textStatus, error ) {
+            var err = textStatus + ", " + error
+            $('#result').html(err)
+          })
     });
     </script>
   </body>
