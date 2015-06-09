@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  </head>
+  <body>
+    Prevous query: <span id="previousQuery"></span><br />
+    <textarea cols="50" id="q">hello</textarea><br />
+    <select id="languageFrom" name="languageFrom"></select>
+    <select id="languageTo" name="languageTo"></select>
+    <input id="translateButton" type="submit" value="translate" />
+    <div id="result"></div>
+
+    <script>
+
+    var baseUrl = 'http://api.apertium.org/json/translate?callback=?'
+    var supported_pairs = {"ro":["es"],"es":["fr","ro","ca_valencia","gl","ca","pt","eo","en","oc_aran","pt_BR","oc","an","en_US"],"en":["gl","ca","es","eo"],"oc":["es","ca"],"mk":["bg","en"],"fr":["es","eo","ca"],"pt":["gl","ca","es"],"oc_aran":["ca","es"],"an":["es"],"eu":["es"],"nb":["nn_a","nn"],"ca":["pt","en_US","oc_aran","oc","fr","eo","en","es"],"is":["en","sv"],"gl":["en","es","pt"],"nn":["nb","nn_a"],"cy":["en"],"br":["fr"],"bg":["mk"],"sv":["da"],"da":["sv"],"it":["ca"],"eo":["en"],"nn_a":["nn"]}
+
+    $(function() {
+        $('#previousQuery').html(localStorage.getItem('previousQuery'))
+        for (i in supported_pairs) {
+      		$('#languageFrom').append($('<option></option>').html(i).val(i) )
+        }
+	      $('#languageFrom').change(function() {
+	        var val = $(this).val()
+	        $('#languageTo').html('')
+	        for (i in supported_pairs[val]) {
+						var languageTo = supported_pairs[val][i];
+	          $('#languageTo').append($('<option></option>').html(languageTo).val(languageTo))
+	        }
+	      }).change()
+
+
+    });
+
+    $('#translateButton').click(function() {
+
+        var languageFrom = $('#languageFrom').val()
+        var languageTo = $('#languageTo').val()
+        $.getJSON( baseUrl, { q: $('#q').val(), langpair: languageFrom+"|"+languageTo})
+	        .done(function(json) {
+	          $('#result').html(json.responseData.translatedText)
+	      		var previousQuery = $('#q').val() + " from: " + languageFrom + " to: " + languageTo
+	      		localStorage.setItem('previousQuery', previousQuery)
+	          $('#previousQuery').html(localStorage.getItem('previousQuery'))
+	        })
+	        .fail(function( jqxhr, textStatus, error ) {
+	          var err = textStatus + ", " + error
+	          $('#result').html(err)
+	      	})
+    });
+    </script>
+  </body>
+</html>
